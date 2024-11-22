@@ -7,12 +7,22 @@ export default function Home() {
   const [quizActive, setQuizActive] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [feedback, setFeedback] = useState("");
+  const [isLocked, setIsLocked] = useState(false); // Prevent multiple inputs during feedback
 
   useEffect(() => {
     const handleKeyPress = (event) => {
       const key = event.key.toUpperCase();
+
+      if (isLocked) return; // Ignore input if locked
+
       if (!quizActive) {
-        if (key === "S") setQuizActive(true); // Start quiz
+        if (key === "S") {
+          // Start quiz and reset state
+          setQuizActive(true);
+          setCurrentQuestionIndex(0);
+          setFeedback("");
+          setIsLocked(false);
+        }
         return;
       }
 
@@ -21,11 +31,18 @@ export default function Home() {
         setQuizActive(false);
         setCurrentQuestionIndex(0);
         setFeedback("");
+        setIsLocked(false);
         return;
       }
 
       if (["A", "B", "C", "D"].includes(key)) {
         const currentQuestion = data[currentQuestionIndex];
+
+        if (!currentQuestion) return; // Guard against undefined question
+
+        // Lock input during feedback display
+        setIsLocked(true);
+
         if (key === currentQuestion.correctAnswer) {
           setFeedback("Correct Answer!");
         } else {
@@ -37,9 +54,11 @@ export default function Home() {
           if (currentQuestionIndex < data.length - 1) {
             setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
             setFeedback("");
+            setIsLocked(false); // Unlock input after delay
           } else {
             setQuizActive(false); // End quiz if last question
             setFeedback("Quiz Completed! Well done.");
+            setIsLocked(false); // Ensure input is unlocked after quiz ends
           }
         }, 1000);
       }
@@ -49,7 +68,7 @@ export default function Home() {
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [quizActive, currentQuestionIndex]);
+  }, [quizActive, currentQuestionIndex, isLocked]);
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)] p-20">
@@ -83,7 +102,7 @@ export default function Home() {
                 <button
                   className="btn mt-2 text-left"
                   key={option}
-                  disabled={i !== currentQuestionIndex}
+                  disabled={i !== currentQuestionIndex || isLocked} // Disable buttons if not active or locked
                 >
                   {option}. {el.options[option]}
                 </button>
