@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const AddQuetsionForm = ({ addQuestion }) => {
   const [question, setQuestion] = useState("");
@@ -126,30 +127,26 @@ const AddQuetsionForm = ({ addQuestion }) => {
 };
 
 const AdminPanel = () => {
-  const [questions, setQuestions] = useState([
-    {
-      order: 1,
-      question: "What is the capital of France?",
-      options: {
-        A: "Berlin",
-        B: "Madrid",
-        C: "Paris",
-        D: "Rome",
-      },
-      correctAnswer: "C",
-    },
-    {
-      order: 2,
-      question: "Which planet is known as the Red Planet?",
-      options: {
-        A: "Earth",
-        B: "Mars",
-        C: "Jupiter",
-        D: "Venus",
-      },
-      correctAnswer: "B",
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [topic, setTopic] = useState("");
+  const [id, setId] = useState("");
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`/api/data`)
+      .then((resp) => {
+        console.log("data: ", resp.data);
+        setTopic(resp.data.data.topic);
+        setId(resp.data.data._id);
+        setQuestions(resp.data.data.questions);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log("error: ", error);
+        setLoading("error");
+      });
+  }, []);
 
   const deleteQuestion = (orderToDelete) => {
     setQuestions((prevQuestions) => {
@@ -170,6 +167,10 @@ const AdminPanel = () => {
       { ...questionData, order: questions.length + 1 },
     ]);
   };
+
+  if (loading === "error") return "Something went wrong";
+
+  if (loading) return "Loading...";
 
   return (
     <main className="pb-28">
