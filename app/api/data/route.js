@@ -25,7 +25,10 @@ export async function GET(req) {
 
 export async function PUT(req) {
   const body = await req.json();
-  if (!body?.pass || !body?._id) {
+  if (
+    (!body?.pass && body.pass !== process.env.NEXT_PUBLIC_PASS) ||
+    !body?._id
+  ) {
     return NextResponse.json(
       { success: false, error: new Error("invalid params") },
       { status: 401 }

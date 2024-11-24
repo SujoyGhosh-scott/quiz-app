@@ -1,15 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { quizQuestions as data } from "./data";
+// import { quizQuestions as data } from "./data";
+import axios from "axios";
 
 export default function Home() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [quizActive, setQuizActive] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [isLocked, setIsLocked] = useState(false); // Prevent multiple inputs during feedback
 
   useEffect(() => {
+    if (loading) return;
     const handleKeyPress = (event) => {
       const key = event.key.toUpperCase();
 
@@ -68,7 +72,23 @@ export default function Home() {
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [quizActive, currentQuestionIndex, isLocked]);
+  }, [quizActive, currentQuestionIndex, isLocked, loading]);
+
+  useEffect(() => {
+    axios
+      .get("/api/data")
+      .then((resp) => {
+        console.log("data: ", resp.data);
+        setData(resp.data.data.questions);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log("get data error: ", error);
+        alert("Something went wrong");
+      });
+  }, []);
+
+  if (loading) return "Loading...";
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)] p-20">
