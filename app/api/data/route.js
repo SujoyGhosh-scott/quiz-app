@@ -13,7 +13,16 @@ export async function GET(req) {
         success: true,
         data: quiz,
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+          "Surrogate-Control": "no-store",
+        },
+      }
     );
   } catch (error) {
     console.log("get quiz error", error);

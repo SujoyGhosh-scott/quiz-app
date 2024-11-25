@@ -20,7 +20,9 @@ export default function AdminPanelPage() {
     if (isLogin) return;
 
     axios
-      .get(`/api/data`)
+      .get(`/api/data`, {
+        params: { _t: Date.now() }, // Adding a unique timestamp
+      })
       .then((resp) => {
         console.log("data: ", resp.data);
         setTopic(resp.data.data.topic);

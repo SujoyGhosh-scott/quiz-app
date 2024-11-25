@@ -10,7 +10,10 @@ export default async function Page() {
 
   try {
     const response = await axios.get(
-      `https://brainy-quest.netlify.app/api/data`
+      `https://brainy-quest.netlify.app/api/data`,
+      {
+        params: { _t: Date.now() }, // Adding a unique timestamp
+      }
     );
     // console.log("response: ", response);
     data = response.data.data.questions;
