@@ -10,7 +10,7 @@ export default async function Page() {
 
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_BASE}/api/data`
+      `https://brainy-quest.netlify.app/api/data`
     );
     // console.log("response: ", response);
     data = response.data.data.questions;
