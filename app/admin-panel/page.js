@@ -65,7 +65,7 @@ export default function AdminPanelPage() {
     }
 
     axios
-      .put(`/api/data`, {
+      .post(`/api/data`, {
         _id: id,
         topic,
         questions,

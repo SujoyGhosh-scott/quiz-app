@@ -23,7 +23,7 @@ export async function GET(req) {
   }
 }
 
-export async function PUT(req) {
+export async function POST(req) {
   const body = await req.json();
   if (
     (!body?.pass && body.pass !== process.env.NEXT_PUBLIC_PASS) ||
