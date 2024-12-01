@@ -122,8 +122,8 @@ export default function Home({ data, topic }) {
                 ) : null}
               </div>
               <div className="grid grid-cols-4 gap-10">
-                {Object.keys(el.options).map((option) => (
-                  <div className="flex flex-col items-center">
+                {Object.keys(el.options).map((option, i) => (
+                  <div key={i} className="flex flex-col items-center">
                     <div className="text-3xl text-white bg-red-800 p-4 w-32 text-center font-extrabold rounded-3xl rounded-b-none">
                       {option}
                     </div>
