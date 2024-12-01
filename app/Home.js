@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// import { quizQuestions as data } from "./data";
 
 export default function Home({ data, topic }) {
   const [quizActive, setQuizActive] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [explanation, setExplanation] = useState("");
   const [isLocked, setIsLocked] = useState(false); // Prevent multiple inputs during feedback
 
   useEffect(() => {
-    if (typeof window === "undefined" && process.browswer) return;
+    if (typeof window === "undefined") return;
 
     const handleKeyPress = (event) => {
       const key = event.key.toUpperCase();
@@ -51,18 +52,11 @@ export default function Home({ data, topic }) {
           setFeedback("Incorrect Answer!");
         }
 
-        // Move to next question after a short delay
-        setTimeout(() => {
-          if (currentQuestionIndex < data.length - 1) {
-            setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-            setFeedback("");
-            setIsLocked(false); // Unlock input after delay
-          } else {
-            setQuizActive(false); // End quiz if last question
-            setFeedback("Quiz Completed! Well done.");
-            setIsLocked(false); // Ensure input is unlocked after quiz ends
-          }
-        }, 1000);
+        // Show modal with explanation
+        setExplanation(
+          currentQuestion.explaination || "No explanation provided."
+        );
+        setModalVisible(true);
       }
     };
 
@@ -71,6 +65,33 @@ export default function Home({ data, topic }) {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [quizActive, currentQuestionIndex, isLocked]);
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setIsLocked(false);
+
+    if (currentQuestionIndex < data.length - 1) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    } else {
+      setQuizActive(false); // End quiz if last question
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (modalVisible) {
+        handleCloseModal();
+      }
+    };
+
+    if (modalVisible) {
+      document.addEventListener("keydown", handleKeyPress);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [modalVisible]);
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)] bg-amber-100 min-h-screen ">
@@ -96,7 +117,7 @@ export default function Home({ data, topic }) {
         </p>
       </div>
 
-      <div className="px-20 border border-orange-200">
+      <div className="px-20">
         {quizActive ? (
           data.map((el, i) => (
             <div
@@ -133,11 +154,6 @@ export default function Home({ data, topic }) {
                   </div>
                 ))}
               </div>
-              {i === currentQuestionIndex && feedback && (
-                <p className="text-lg font-medium mt-4 text-blue-600">
-                  {feedback}
-                </p>
-              )}
             </div>
           ))
         ) : (
@@ -158,6 +174,30 @@ export default function Home({ data, topic }) {
           </strong>
         </p>
       </div>
+
+      {/* Modal */}
+      {modalVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-amber-100 p-12 rounded-3xl w-[800px] mx-auto text-center border-2 border-red-800">
+            <h2 className="text-4xl font-bold mb-4 text-red-800 uppercase">
+              {feedback}
+            </h2>
+            <h1 className="text-2xl mt-2 mb-6 font-bold text-red-800">
+              Because
+            </h1>
+            <div
+              className="text-lg text-red-800 mb-6"
+              dangerouslySetInnerHTML={{ __html: explanation }}
+            ></div>
+            <button
+              // onClick={handleCloseModal}
+              className="bg-orange-300 text-white px-8 py-4 rounded-2xl text-lg uppercase font-bold"
+            >
+              Press any key to continue.
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
