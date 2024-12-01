@@ -50,6 +50,7 @@ export default function AdminPanelPage() {
   };
 
   const addQuestion = (questionData) => {
+    console.log({ questionData });
     setQuestions([
       ...questions,
       { ...questionData, order: questions.length + 1 },
@@ -71,7 +72,7 @@ export default function AdminPanelPage() {
         _id: id,
         topic,
         questions,
-        pass: "1234",
+        pass: process.env.NEXT_PUBLIC_PASS,
       })
       .then((resp) => {
         console.log(resp.data);
@@ -137,6 +138,9 @@ export default function AdminPanelPage() {
             >
               Remove
             </button>
+            {el.image ? (
+              <img src={el.image} alt="" className="h-60 object-contain mb-6" />
+            ) : null}
             <p className="text-xl font-semibold mb-4">
               {el.order}. {el.question}
             </p>

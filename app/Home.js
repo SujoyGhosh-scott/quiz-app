@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 // import { quizQuestions as data } from "./data";
 
-export default function Home({ data }) {
+export default function Home({ data, topic }) {
   const [quizActive, setQuizActive] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -73,55 +73,91 @@ export default function Home({ data }) {
   }, [quizActive, currentQuestionIndex, isLocked]);
 
   return (
-    <div className="font-[family-name:var(--font-geist-sans)] p-20">
-      <div className="mb-12">
-        <h1 className="text-3xl text-center font-semibold text-gray-800">
-          Brainy Quest
-        </h1>
-        <p className="text-gray-600 text-center mt-3">
+    <div className="font-[family-name:var(--font-geist-sans)] bg-amber-100 min-h-screen ">
+      <div className="py-6 font-bold text-lg bg-orange-300 text-center text-red-800 relative">
+        <div className="absolute top-0 left-4 h-40">
+          <img src="/logo.png" className="h-full object-contain" />
+        </div>
+        <h1 className="text-5xl font-extrabold mb-2">BOSE INSTITUTE</h1>
+        <p>
+          An Autonomous Institute under Department of Science and Technology
+        </p>
+        <p>Ministry of Science and Technology, Govt. of India</p>
+      </div>
+      <div className="my-12 text-red-800 text-xl">
+        <h1 className="text-3xl text-center font-extrabold">{topic}</h1>
+        <p className="text-center mt-3">
           Press <strong>S</strong> to start the quiz and <strong>X</strong> to
           exit the quiz.
         </p>
-        <p className="text-gray-600 text-center">
+        <p className="text-center">
           Please use the <strong>A, B, C, D</strong> keys on your keyboard to
           answer.
         </p>
       </div>
 
-      {quizActive ? (
-        data.map((el, i) => (
-          <div
-            className={`${
-              i === currentQuestionIndex ? "bg-green-50" : "bg-gray-50"
-            } p-6 mb-6 rounded-md`}
-            key={i}
-          >
-            <p className="text-xl font-semibold mb-4">
-              {el.order}. {el.question}
-            </p>
-            <div className="grid grid-cols-2">
-              {Object.keys(el.options).map((option) => (
-                <button
-                  className="btn mt-2 text-left"
-                  key={option}
-                  disabled={i !== currentQuestionIndex || isLocked} // Disable buttons if not active or locked
-                >
-                  {option}. {el.options[option]}
-                </button>
-              ))}
+      <div className="px-20 border border-orange-200">
+        {quizActive ? (
+          data.map((el, i) => (
+            <div
+              className={`${
+                i === currentQuestionIndex ? "bg-orange-200" : ""
+              } p-12 mb-6 rounded-3xl`}
+              key={i}
+            >
+              <div className="flex items-center">
+                <div className="flex-1">
+                  <p className="text-xl font-semibold mb-4 text-red-800">
+                    {el.order}. {el.question}
+                  </p>
+                </div>
+                {el.image ? (
+                  <div className="flex-1 flex justify-center items-center">
+                    <img
+                      src={el.image}
+                      alt=""
+                      className="h-80 max-h-[320px] object-contain rounded-3xl border-2 border-red-800"
+                    />
+                  </div>
+                ) : null}
+              </div>
+              <div className="grid grid-cols-4 gap-10">
+                {Object.keys(el.options).map((option) => (
+                  <div className="flex flex-col items-center">
+                    <div className="text-3xl text-white bg-red-800 p-4 w-32 text-center font-extrabold rounded-3xl rounded-b-none">
+                      {option}
+                    </div>
+                    <div className="text-center text-xl font-semibold text-red-800 w-full rounded-3xl bordder border-2 border-red-800 bg-orange-300 p-20">
+                      {el.options[option]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {i === currentQuestionIndex && feedback && (
+                <p className="text-lg font-medium mt-4 text-blue-600">
+                  {feedback}
+                </p>
+              )}
             </div>
-            {i === currentQuestionIndex && feedback && (
-              <p className="text-lg font-medium mt-4 text-blue-600">
-                {feedback}
-              </p>
-            )}
-          </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-600 mt-12">
-          Press <strong>S</strong> to start the quiz.
+          ))
+        ) : (
+          <p className="text-center text-xl text-red-800 mt-12">
+            Press <strong>S</strong> to start the quiz.
+          </p>
+        )}
+        <p className="text-sm text-right pb-6 text-red-800">
+          made by{" "}
+          <strong>
+            <a
+              href="https://phenixlabs.in/"
+              target="_blank"
+              className="hover:underline decoration-2"
+            >
+              phenixLabs
+            </a>
+          </strong>
         </p>
-      )}
+      </div>
     </div>
   );
 }

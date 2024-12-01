@@ -13,6 +13,56 @@ const AddQuetsionForm = ({ addQuestion }) => {
   const [optionD, setOptionD] = useState("");
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [explaination, setExplaination] = useState("");
+  const [image, setImage] = useState("");
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      alert("Please choose a file to upload.");
+      return;
+    }
+
+    const fileSizeMB = file.size / (1024 * 1024);
+    if (fileSizeMB > 5) {
+      alert("File size should be less than 5MB.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploading(true);
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      console.log("data: ", data);
+
+      if (data.success) {
+        console.log("setting: ", data.imgUrl.url);
+        setImage(data.imgUrl.url);
+      } else {
+        alert("Failed to upload file. Please try again.");
+      }
+    } catch (error) {
+      console.log("image upload error: ", error);
+      alert("Something went wrong! Please try again later.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = () => {
     if (!question) {
@@ -46,6 +96,7 @@ const AddQuetsionForm = ({ addQuestion }) => {
       },
       correctAnswer: correctAnswer.toUpperCase(),
       explaination,
+      image,
     };
 
     addQuestion(questionData);
@@ -55,6 +106,8 @@ const AddQuetsionForm = ({ addQuestion }) => {
     setOptionB("");
     setOptionC("");
     setOptionD("");
+    setImage("");
+    setFile(null);
     setCorrectAnswer("");
     setExplaination("");
   };
@@ -68,6 +121,45 @@ const AddQuetsionForm = ({ addQuestion }) => {
         onChange={(e) => setQuestion(e.target.value)}
         className="border w-full p-2 px-4 mt-1 mb-4 outline-0"
       />
+      <label className="w-full">
+        <div className="label">
+          <span className="label-text">
+            Question Image (To insert image in question select the file and
+            upload)
+          </span>
+        </div>
+        <input
+          type="file"
+          className="file-input file-input-bordered w-full max-w-xs"
+          accept="image/png, image/jpg, image/jpeg"
+          onChange={handleFileChange}
+        />
+        <button onClick={handleUpload} className="bg-green-300 px-4 py-2">
+          Upload Image
+        </button>
+      </label>
+      <div className="flex mb-6">
+        <input
+          className="py-2 px-4 flex-1 outline-none"
+          readOnly
+          value={
+            uploading
+              ? "Uploading image. Please wait..."
+              : image
+              ? `Image uploaded: ${image}`
+              : "No image uploaded"
+          }
+        />
+        <button
+          onClick={() => {
+            setImage("");
+            setFile(null);
+          }}
+          className="bg-red-400 px-4 py-2"
+        >
+          Remove Image
+        </button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label>Choice A</label>
