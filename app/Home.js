@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function Home({ data, topic }) {
-  const [quizActive, setQuizActive] = useState(false);
+  const [quizActive, setQuizActive] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -20,26 +20,6 @@ export default function Home({ data, topic }) {
       const key = event.key.toUpperCase();
 
       if (isLocked) return; // Ignore input if locked
-
-      if (!quizActive) {
-        if (key === "S") {
-          // Start quiz and reset state
-          setQuizActive(true);
-          setCurrentQuestionIndex(0);
-          setFeedback("");
-          setIsLocked(false);
-        }
-        return;
-      }
-
-      if (key === "X") {
-        // Exit quiz
-        setQuizActive(false);
-        setCurrentQuestionIndex(0);
-        setFeedback("");
-        setIsLocked(false);
-        return;
-      }
 
       if (["A", "B", "C", "D"].includes(key)) {
         const currentQuestion = data[currentQuestionIndex];
@@ -67,7 +47,7 @@ export default function Home({ data, topic }) {
     return () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [quizActive, currentQuestionIndex, isLocked]);
+  }, [currentQuestionIndex, isLocked]);
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -76,12 +56,14 @@ export default function Home({ data, topic }) {
     if (currentQuestionIndex < data.length - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     } else {
-      setQuizActive(false); // End quiz if last question
+      // Restart quiz from the beginning
+      setCurrentQuestionIndex(0);
+      setQuizActive(true);
     }
   };
 
   useEffect(() => {
-    const handleKeyPress = (event) => {
+    const handleKeyPress = () => {
       if (modalVisible) {
         handleCloseModal();
       }
@@ -117,21 +99,17 @@ export default function Home({ data, topic }) {
           An Autonomous Institute under Department of Science and Technology
         </p>
         <p>Ministry of Science and Technology, Govt. of India</p>
-      </div>
-      <div className="my-12 text-red-800 text-xl">
-        <h1 className="text-3xl text-center font-extrabold">{topic}</h1>
-        <p className="text-center mt-3">
-          Press <strong>S</strong> to start the quiz and <strong>X</strong> to
-          exit the quiz.
-        </p>
-        <p className="text-center">
+        <p>
           Please use the <strong>A, B, C, D</strong> keys on your keyboard to
           answer.
         </p>
       </div>
+      <div className="my-12 text-red-800 text-xl">
+        <h1 className="text-3xl text-center font-extrabold">{topic}</h1>
+      </div>
 
       <div className="px-20">
-        {quizActive ? (
+        {quizActive &&
           data.map((el, i) => (
             <div
               ref={(el) => (questionRefs.current[i] = el)} // Assign ref to each question
@@ -169,12 +147,7 @@ export default function Home({ data, topic }) {
                 ))}
               </div>
             </div>
-          ))
-        ) : (
-          <p className="text-center text-xl text-red-800 mt-12">
-            Press <strong>S</strong> to start the quiz.
-          </p>
-        )}
+          ))}
         <p className="text-sm text-right pb-6 text-red-800">
           made by{" "}
           <strong>
