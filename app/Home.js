@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home({ data, topic }) {
   const [quizActive, setQuizActive] = useState(false);
@@ -9,6 +9,9 @@ export default function Home({ data, topic }) {
   const [feedback, setFeedback] = useState("");
   const [explanation, setExplanation] = useState("");
   const [isLocked, setIsLocked] = useState(false); // Prevent multiple inputs during feedback
+
+  // Create refs for each question
+  const questionRefs = useRef([]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -93,11 +96,21 @@ export default function Home({ data, topic }) {
     };
   }, [modalVisible]);
 
+  // Scroll to the current question when it changes
+  useEffect(() => {
+    if (questionRefs.current[currentQuestionIndex]) {
+      questionRefs.current[currentQuestionIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [currentQuestionIndex]);
+
   return (
-    <div className="font-[family-name:var(--font-geist-sans)] bg-amber-100 min-h-screen ">
-      <div className="py-6 font-bold text-lg bg-orange-300 text-center text-red-800 relative">
-        <div className="absolute top-0 left-4 h-40">
-          <img src="/logo.png" className="h-full object-contain" />
+    <div className="font-[family-name:var(--font-geist-sans)] bg-amber-100 min-h-screen">
+      <div className="py-6 font-bold text-lg bg-orange-300 text-center text-red-800 h-[20vh] sticky top-0 w-full">
+        <div className="absolute top-0 left-6 h-[20vh] flex items-center">
+          <img src="/logo.png" className="h-4/5 object-contain" />
         </div>
         <h1 className="text-5xl font-extrabold mb-2">BOSE INSTITUTE</h1>
         <p>
@@ -121,9 +134,10 @@ export default function Home({ data, topic }) {
         {quizActive ? (
           data.map((el, i) => (
             <div
+              ref={(el) => (questionRefs.current[i] = el)} // Assign ref to each question
               className={`${
                 i === currentQuestionIndex ? "bg-orange-200" : ""
-              } p-12 mb-6 rounded-3xl`}
+              } p-12 mb-6 rounded-3xl min-h-[50vh]`}
               key={i}
             >
               <div className="flex items-center">
