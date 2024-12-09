@@ -90,7 +90,7 @@ export default function Home({ data, topic }) {
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)] bg-amber-100 min-h-screen">
-      <div className="py-6 font-bold text-lg bg-orange-300 text-center text-red-800 h-[20vh] sticky top-0 w-full">
+      <div className="py-6 font-bold text-lg bg-orange-300 text-center text-red-800 min-h-[20vh] sticky top-0 w-full">
         <div className="absolute top-0 left-6 h-[20vh] flex items-center">
           <img src="/logo.png" className="h-4/5 object-contain" />
         </div>
