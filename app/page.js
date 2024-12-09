@@ -26,21 +26,28 @@ export default async function Page() {
   // }
 
   try {
-    const response = await axios.get(
-      `https://brainy-quest.netlify.app/api/data`,
+    const response = await fetch(
+      `https://brainy-quest.netlify.app/api/data?_t=${Date.now()}`, // Adding timestamp to bypass caching
       {
-        params: { _t: Date.now() }, // Adding a unique timestamp to bypass caching
+        method: "GET",
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0", // Explicitly disable caching
           Pragma: "no-cache", // For backward compatibility with HTTP/1.0
         },
+        cache: "no-cache",
       }
     );
-    data = response.data.data.questions;
-    topic = response.data.data.topic;
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    data = result.data.questions;
+    topic = result.data.topic;
     isSuccess = true;
   } catch (error) {
-    console.log("get data error: ", error);
+    console.log("Fetch data error: ", error);
     isSuccess = "error";
   }
 
