@@ -10,6 +10,8 @@ export default function Home({ data, topic }) {
   const [explanation, setExplanation] = useState("");
   const [isLocked, setIsLocked] = useState(false); // Prevent multiple inputs during feedback
 
+  console.log("data: ", data);
+
   // Create refs for each question
   const questionRefs = useRef([]);
 
